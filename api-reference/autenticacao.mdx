@@ -1,0 +1,31 @@
+---
+title: Autorização da API
+description: 'Aprenda como funciona a autorização na API do Voz Pra Video e como utilizar tokens de acesso.'
+---
+
+## Autorização da API
+
+Para utilizar a API do **Voz Pra Video**, é necessário um processo de autorização que garante a segurança e o controle de acesso aos recursos disponíveis. Todas as requisições à nossa API exigem a utilização de um **token de acesso**, que deve ser incluído nos cabeçalhos das requisições HTTP.
+
+### Como Funciona a Autorização?
+
+A autorização na API do **Voz Pra Video** é baseada em **tokens**. Estes tokens são fornecidos após a criação de uma conta e a configuração da autenticação. Eles identificam e verificam se o usuário ou a aplicação tem permissão para acessar os recursos da API.
+
+#### Passos para Obter o Token de Acesso:
+
+1. **Criação de Conta**
+   
+   Antes de interagir com a API, você precisa criar uma conta no **Voz Pra Video**. O token de acesso será gerado automaticamente após o registro e estará disponível no painel do usuário.
+
+2. **Geração do Token**
+
+   No painel de controle da sua conta, você poderá gerar e gerenciar seus tokens de API. Esses tokens são únicos e garantem que apenas usuários autorizados possam acessar os serviços.
+
+3. **Incluindo o Token na Requisição**
+
+   Para autenticar suas requisições à API, é necessário incluir o token no cabeçalho de cada requisição HTTP. Abaixo está um exemplo de como fazer isso usando o cabeçalho `Authorization`:
+
+   ```bash
+   curl -X POST "https://api.vozpravideo.com/v1/audio" \
+   -H "Authorization: Bearer SEU_TOKEN_DE_ACESSO" \
+   -d '{ "text": "Seu texto aqui" }'
