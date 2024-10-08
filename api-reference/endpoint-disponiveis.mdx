@@ -1,0 +1,232 @@
+---
+title: Endpoint's disponiveis
+description: 'Comprehensive API documentation for generating AI narrations for videos.'
+---
+
+A API do **Voz Pra Video** permite a criação de narrações em áudio utilizando Inteligência Artificial (IA) a partir de textos fornecidos. Neste documento, você encontrará informações sobre como usar os endpoints disponíveis, exemplos de requisição e resposta, e a autenticação necessária.
+
+## Base URL
+
+Todas as requisições da API devem ser feitas para o seguinte endereço:
+
+https://voz-pra-video-api.fly.dev/api
+
+## Endpoints Disponíveis
+
+
+### 1. Listar Vozes de IA
+
+Descrição: **Retorna uma lista de vozes de IA disponíveis para geração de áudio.**
+
+Método: **GET**
+
+Endpoint: **/ai-voices/list**
+
+Exemplo de Requisição:
+
+```bash
+curl --request GET \
+  --url https://voz-pra-video-api.fly.dev/api/ai-voices/list \
+  --header 'Authorization: YOUR_TOKEN'
+```
+
+Exemplo de Resposta:
+
+```bash
+[
+  {
+    "_id": "voicexyz123",
+    "name": "Voz Exemplo",
+    "avatar": "https://example.com/avatar.jpg",
+    "audioPreview": "https://example.com/preview.mp3",
+    "plan": "FREE"
+  }
+]
+```
+
+Status Code: **200 OK**
+
+### 2. Listar Áudios Gerados
+Descrição: **Retorna uma lista de áudios gerados previamente.**
+
+Método: **GET**
+
+Endpoint: **/generations/list**
+
+Exemplo de Requisição:
+
+```bash
+curl --request GET \
+  --url https://voz-pra-video-api.fly.dev/api/generations/list \
+  --header 'Authorization: YOUR_TOKEN'
+
+```
+
+Exemplo de Resposta:
+
+```bash
+[
+  {
+    "_id": "audioxyz123",
+    "aiVoice": {
+      "_id": "voicexyz123",
+      "name": "Voz Exemplo",
+      "avatar": "https://example.com/avatar.jpg",
+      "audioPreview": "https://example.com/preview.mp3",
+      "plan": "FREE"
+    },
+    "text": "Texto de exemplo",
+    "seconds": 10,
+    "link": "https://example.com/audio.mp3",
+    "externalId": "ext123",
+    "complete": true,
+    "createdAt": "2024-10-07T14:33:54.803Z",
+    "updatedAt": "2024-10-07T14:33:54.803Z"
+  }
+]
+
+```
+
+Status Code: **200 OK**
+
+### 3. Gerar Áudio
+
+Descrição: **Gera um áudio baseado no texto e na voz fornecidos.**
+
+Método: **POST**
+
+Endpoint: **/generations/make**
+
+| Propriedade      | Descrição                                                        |
+|------------------|------------------------------------------------------------------|
+| **text**         | Texto a ser transformado em áudio. **(Obrigatório)**             |
+| **voiceId**      | ID da voz que será usada na geração. **(Obrigatório)**           |
+| **externalId**   | ID externo para identificar a geração. **(Obrigatório)**         |
+| **callbackUrl**  | URL de callback para notificação da conclusão. **(Obrigatório)** |
+| **format**       | Formato do áudio gerado (WAV, MP3, OGG). Padrão: **WAV**         |
+
+Exemplo de Requisição:
+
+```bash
+curl --request POST \
+  --url https://voz-pra-video-api.fly.dev/api/generations/make \
+  --header 'Authorization: YOUR_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "text": "Texto de exemplo",
+  "voiceId": "voicexyz123",
+  "externalId": "123456",
+  "callbackUrl": "https://seu-callback.com/notify",
+  "format": "WAV"
+}'
+```
+
+## Estruturas de Dados
+
+### 1. IPublicAIVoice
+
+Este objeto contém as informações de uma voz de IA pública.
+
+| Propriedade    | Tipo     | Descrição                                          |
+|----------------|----------|-------------------------------------------------- |
+| **_id**        | `string` | Identificador único da voz.                        |
+| **name**       | `string` | Nome da voz.                                       |
+| **avatar**     | `string` | URL do avatar associado à voz.                     |
+| **audioPreview**| `string` | URL para o áudio de demonstração da voz.           |
+| **plan**       | `string` | Tipo de plano associado à voz. Pode ser "FREE" ou "PREMIUM". |
+
+Exemplo:
+
+```json
+{
+  "_id": "voicexyz123",
+  "name": "Voz Exemplo",
+  "avatar": "https://example.com/avatar.jpg",
+  "audioPreview": "https://example.com/preview.mp3",
+  "plan": "FREE"
+}
+```
+
+### 2. IPublicGeneration
+
+Este objeto contém os detalhes de uma geração de áudio.
+
+| Propriedade     | Tipo        | Descrição                                          |
+|-----------------|-------------|-------------------------------------------------- |
+| **_id**         | `string`    | Identificador único da geração de áudio.          |
+| **aiVoice**     | `object`    | Objeto contendo informações sobre a voz usada, conforme descrito em `IPublicAIVoice`. |
+| **text**        | `string`    | Texto que foi convertido em áudio.                |
+| **seconds**     | `integer`   | Duração do áudio gerado em segundos.              |
+| **link**        | `string`    | URL para o áudio gerado.                          |
+| **externalId**  | `string`    | Identificador externo da geração.                 |
+| **complete**    | `boolean`   | Status indicando se a geração foi concluída.      |
+| **createdAt**   | `string`    | Data e hora de criação da geração, no formato ISO 8601. |
+| **updatedAt**   | `string`    | Data e hora da última atualização da geração, no formato ISO 8601. |
+
+Exemplo:
+
+```json
+{
+  "_id": "gen123456",
+  "aiVoice": {
+    "_id": "voicexyz123",
+    "name": "Voz Exemplo",
+    "avatar": "https://example.com/avatar.jpg",
+    "audioPreview": "https://example.com/preview.mp3",
+    "plan": "FREE"
+  },
+  "text": "Este é um exemplo de texto.",
+  "seconds": 5,
+  "link": "https://example.com/audio.mp3",
+  "externalId": "ext123",
+  "complete": true,
+  "createdAt": "2024-10-07T14:33:54.803Z",
+  "updatedAt": "2024-10-07T14:33:54.803Z"
+}
+```
+
+### 3. MakeGenerationRequest
+
+Este objeto representa a estrutura de dados necessária para solicitar a geração de um áudio.
+
+| Propriedade     | Tipo        | Descrição                                          |
+|-----------------|-------------|-------------------------------------------------- |
+| **text**        | `string`    | Texto que será convertido em áudio.               |
+| **voiceId**     | `string`    | Identificador da voz que será utilizada para a geração. |
+| **externalId**  | `string`    | Identificador externo da geração.                 |
+| **callbackUrl** | `string`    | URL para a qual será enviada uma notificação após a geração ser concluída. |
+| **format**      | `string`    | Formato do áudio gerado (pode ser `WAV`, `MP3` ou `OGG`). O padrão é `WAV`. |
+
+Exemplo:
+
+```json
+{
+  "text": "Olá, este é um teste de geração de áudio.",
+  "voiceId": "voicexyz123",
+  "externalId": "ext123",
+  "callbackUrl": "https://example.com/callback",
+  "format": "WAV"
+}
+```
+
+### 4. GenerationCallbackPayload
+
+Este objeto representa a estrutura de dados enviada para o `callbackUrl` após a conclusão da geração de áudio.
+
+| Propriedade     | Tipo        | Descrição                                          |
+|-----------------|-------------|---------------------------------------------------|
+| **id**          | `string`    | Identificador único da geração de áudio.          |
+| **duration**    | `integer`   | Duração do áudio gerado em segundos.              |
+| **externalId**  | `string`    | Identificador externo associado à geração.        |
+| **url**         | `string`    | URL onde o áudio gerado pode ser acessado.      |
+
+Exemplo:
+
+```json
+{
+  "id": "gen123",
+  "duration": 15,
+  "externalId": "ext123",
+  "url": "https://example.com/audio/gen123.wav"
+}
+```

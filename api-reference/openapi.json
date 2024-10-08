@@ -1,90 +1,40 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "Voz pra Vídeo API",
+    "description": "API para gerar narrações em áudio utilizando Inteligência Artificial (IA) a partir de textos fornecidos.",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://voz-pra-video-api.fly.dev/api"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "TokenAuth": []
     }
   ],
   "paths": {
-    "/plants": {
+    "/ai-voices/list": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
+        "description": "Retorna uma lista de vozes de IA disponíveis para geração de áudio.",
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Lista de vozes de IA",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plant"
+                    "$ref": "#/components/schemas/IPublicAIVoice"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
+            "description": "Erro inesperado",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +46,63 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
+    "/generations/list": {
+      "get": {
+        "description": "Retorna uma lista de áudios gerados.",
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Lista de áudios gerados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IPublicGeneration"
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Erro inesperado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generations/make": {
+      "post": {
+        "description": "Gera um áudio com base no texto e na voz fornecidos.",
+        "requestBody": {
+          "description": "Dados necessários para gerar o áudio",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MakeGenerationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Solicitação de geração aceita",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MakeGenerationRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro inesperado",
             "content": {
               "application/json": {
                 "schema": {
@@ -132,41 +117,103 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "IPublicAIVoice": {
         "required": [
+          "_id",
           "name"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
+          "_id": {
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
+          "name": {
+            "description": "Nome da voz de IA",
             "type": "string"
+          },
+          "avatar": {
+            "description": "URL do avatar da voz",
+            "type": "string"
+          },
+          "audioPreview": {
+            "description": "URL de pré-visualização do áudio",
+            "type": "string"
+          },
+          "plan": {
+            "description": "Plano disponível para a voz (FREE ou PREMIUM)",
+            "type": "string",
+            "enum": ["FREE", "PREMIUM"]
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "IPublicGeneration": {
+        "required": [
+          "_id",
+          "aiVoice",
+          "text",
+          "link",
+          "complete"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
           },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
+          "aiVoice": {
+            "$ref": "#/components/schemas/IPublicAIVoice"
+          },
+          "text": {
+            "type": "string"
+          },
+          "seconds": {
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           }
-        ]
+        }
+      },
+      "MakeGenerationRequest": {
+        "required": [
+          "text",
+          "voiceId",
+          "externalId",
+          "callbackUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "voiceId": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "callbackUrl": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["WAV", "MP3", "OGG"],
+            "default": "WAV"
+          }
+        }
       },
       "Error": {
         "required": [
@@ -186,7 +233,7 @@
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
+      "TokenAuth": {
         "type": "http",
         "scheme": "bearer"
       }

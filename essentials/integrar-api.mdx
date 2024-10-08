@@ -1,0 +1,58 @@
+---
+title: Integração com a API
+description: 'Aprenda como integrar a API do Voz Pra Video em suas aplicações para gerar áudios a partir de textos.'
+icon: code
+---
+
+## Integração com a API do Voz Pra Video
+
+O **Voz Pra Video** oferece uma API robusta que permite a integração fácil de nossas funcionalidades de geração de áudio em suas aplicações. Com a API, você pode transformar textos em faixas de áudio de alta qualidade, tornando a experiência do usuário ainda mais rica e envolvente.
+
+### Por Que Integrar com a API?
+
+1. **Flexibilidade**: A API permite que você personalize a geração de áudio de acordo com suas necessidades específicas. Você pode enviar textos, escolher vozes e ajustar parâmetros, tudo programaticamente.
+
+2. **Automação**: Com a integração da API, você pode automatizar o processo de geração de áudio em suas aplicações, reduzindo o tempo e o esforço necessários para criar conteúdos de áudio.
+
+3. **Escalabilidade**: A API é projetada para lidar com um alto volume de solicitações, permitindo que você escale suas operações conforme necessário.
+
+### Como Funciona a Integração?
+
+Para integrar a API do **Voz Pra Video** em sua aplicação, siga estas etapas:
+
+1. **Criação de Conta**: Primeiro, crie uma conta no **Voz Pra Video** e obtenha seu token de autenticação.
+
+2. **Configuração da API**: Utilize seu token para autenticar suas solicitações à API. Você pode usar bibliotecas como `Axios` ou `Fetch` para facilitar as requisições HTTP em sua aplicação.
+
+3. **Realização de Solicitações**: Faça chamadas para os endpoints da API para gerar áudios. Por exemplo, você pode enviar uma solicitação com um texto para o endpoint de geração de áudio e receber a faixa gerada em resposta.
+
+### Exemplos de Código
+
+Aqui estão alguns exemplos de como fazer uma solicitação à API usando JavaScript:
+
+```javascript
+import axios from 'axios';
+
+const token = 'SEU_TOKEN_AQUI'; // Substitua pelo seu token
+
+const gerarAudio = async (texto) => {
+  try {
+    const response = await axios.post('https://api.vozpavideo.com/generate', {
+      text: texto,
+      voice: 'nome_da_voz', // Especifique a voz desejada
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // O áudio gerado estará na resposta
+    console.log('Áudio gerado:', response.data.audioUrl);
+  } catch (error) {
+    console.error('Erro ao gerar áudio:', error);
+  }
+};
+
+// Exemplo de uso
+gerarAudio('Olá, bem-vindo ao Voz Pra Video!');
